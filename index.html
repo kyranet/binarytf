@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for binarytf">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -47,12 +48,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<ul class="tsd-breadcrumb">
-				<li>
-					<a href="globals.html">Globals</a>
-				</li>
-			</ul>
-			<h1>binarytf</h1>
+			<h1>Project binarytf</h1>
 		</div>
 	</div>
 </header>
@@ -87,13 +83,14 @@
 				<p><code>Binary Term Format</code> is a term format inspired in ETF with more types and circular reference serialization and deserialization.
 				This term format is designed to fix one of ETF&#39;s flaws: byte size.</p>
 				<p>Serializing this object:</p>
-				<pre><code class="language-json">{
-    <span class="hljs-attr">&quot;test&quot;</span>: [<span class="hljs-string">&quot;hello&quot;</span>, <span class="hljs-string">&quot;world&quot;</span>],
-    <span class="hljs-attr">&quot;more&quot;</span>: {
-        <span class="hljs-attr">&quot;nested&quot;</span>: <span class="hljs-string">&quot;objects&quot;</span>,
-        <span class="hljs-attr">&quot;do&quot;</span>: [<span class="hljs-string">&quot;you&quot;</span>, <span class="hljs-string">&quot;like&quot;</span>, <span class="hljs-string">&quot;it?&quot;</span>]
-    }
-}</code></pre>
+				<pre><code class="language-json"><span style="color: #000000">{</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;test&quot;</span><span style="color: #000000">: [</span><span style="color: #A31515">&quot;hello&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;world&quot;</span><span style="color: #000000">],</span>
+<span style="color: #000000">    </span><span style="color: #0451A5">&quot;more&quot;</span><span style="color: #000000">: {</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;nested&quot;</span><span style="color: #000000">: </span><span style="color: #A31515">&quot;objects&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #0451A5">&quot;do&quot;</span><span style="color: #000000">: [</span><span style="color: #A31515">&quot;you&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;like&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;it?&quot;</span><span style="color: #000000">]</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+</code></pre>
 				<p>Takes <code>80</code> bytes as <code>JSON.stringify()</code>&#39;d, <code>116</code> bytes as <code>ETF</code> using <a href="https://github.com/devsnek/earl"><code>devsnek/earl</code></a>, and just <code>71</code> bytes in <code>BTF</code>.</p>
 				<p>The extreme compression is achieved by delimiting the bytes using a technique similar to <a href="https://en.wikipedia.org/wiki/Null-terminated_string">null delimited string</a>s. Allowing every string, array, set, map, and object, to trim the byte size by 3 (4 bytes for length/size -&gt; 1 byte to delimit the field). TypedArrays do not get this feature, since they have a type for all elements instead of a type for each element, <code>[0]</code> works because it is encoded as <code>ArrayType</code> + <code>NumberByteLiteralType</code> + <code>0x00</code> + <code>NullDelimiter</code>, but this technique would not work in <code>Uint8Array[0]</code> (<code>Uint8ArrayType</code> + <code>0x00 + 0x00 + 0x00 + 0x01</code> + <code>0x00</code>).</p>
 				<p>And this is also achieved by using special types for empty collections, <code>[null]</code> takes 3 bytes (<code>ArrayType</code> + <code>NullType</code> + <code>NullDelimiter</code>), but <code>[]</code> takes a single byte (<code>EmptyArrayType</code>). This also applies to empty objects, sets, and maps.</p>
@@ -101,19 +98,21 @@
 					<h2>Usage</h2>
 				</a>
 				<p>This module is <a href="https://en.wikipedia.org/wiki/Plug_and_play">plug-and-play</a>, it exposes two functions, <code>serialize</code> and <code>deserialize</code>, and would be used in the following way:</p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { serialize, deserialize } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;binarytf&#x27;</span>);
+				<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">serialize</span><span style="color: #000000">, </span><span style="color: #0070C1">deserialize</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;binarytf&#039;</span><span style="color: #000000">);</span>
 
-<span class="hljs-keyword">const</span> serialized = serialize({ <span class="hljs-attr">hello</span>: <span class="hljs-string">&#x27;world&#x27;</span> });
-<span class="hljs-keyword">const</span> deserialized = deserialize(serialized);
-<span class="hljs-built_in">console</span>.log(deserialized); <span class="hljs-comment">// { hello: &#x27;world&#x27; }</span></code></pre>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">serialized</span><span style="color: #000000"> = </span><span style="color: #795E26">serialize</span><span style="color: #000000">({ </span><span style="color: #001080">hello:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;world&#039;</span><span style="color: #000000"> });</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">deserialized</span><span style="color: #000000"> = </span><span style="color: #795E26">deserialize</span><span style="color: #000000">(</span><span style="color: #001080">serialized</span><span style="color: #000000">);</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">deserialized</span><span style="color: #000000">); </span><span style="color: #008000">// { hello: &#039;world&#039; }</span>
+</code></pre>
 				<p>This module is TypeScript ready and comes with types included. To import with ESM use the following syntax:</p>
-				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { serialize, deserialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;binarytf&#x27;</span>;</code></pre>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">serialize</span><span style="color: #000000">, </span><span style="color: #001080">deserialize</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;binarytf&#039;</span><span style="color: #000000">;</span>
+</code></pre>
 				<a href="#credit" id="credit" style="color: inherit; text-decoration: none;">
 					<h2>Credit</h2>
 				</a>
 				<p><code>binarytf</code> is heavily based on <a href="https://github.com/devsnek/earl"><code>devsnek/earl</code></a>, this module wouldn&#39;t be possible without it&#39;s author:</p>
 				<ul>
-					<li><a href="https://github.com/devsnek">Gus Caplan</a></li>
+					<li>  <a href="https://github.com/devsnek">Gus Caplan</a></li>
 				</ul>
 				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
 					<h2>Contributing</h2>
@@ -157,84 +156,21 @@
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="globals.html"><em>Globals</em></a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/bigintegers.html">Big<wbr>Integers</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/numbers.html">Numbers</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/regexps.html">Reg<wbr>Exps</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/typedarrays.html">Typed<wbr>Arrays</a>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum">
-						<a href="enums/binaryprimitives.html" class="tsd-kind-icon">Binary<wbr>Primitives</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/binarytokens.html" class="tsd-kind-icon">Binary<wbr>Tokens</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/deserializerreason.html" class="tsd-kind-icon">Deserializer<wbr>Reason</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/serializerreason.html" class="tsd-kind-icon">Serializer<wbr>Reason</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/deserializer.html" class="tsd-kind-icon">Deserializer</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/deserializererror.html" class="tsd-kind-icon">Deserializer<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/serializer.html" class="tsd-kind-icon">Serializer</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/serializererror.html" class="tsd-kind-icon">Serializer<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/onunsupported.html" class="tsd-kind-icon">On<wbr>Unsupported</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#typedarray" class="tsd-kind-icon">Typed<wbr>Array</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#max_int32" class="tsd-kind-icon">MAX_<wbr>INT32</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#max_int8" class="tsd-kind-icon">MAX_<wbr>INT8</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#min_int32" class="tsd-kind-icon">MIN_<wbr>INT32</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#min_int8" class="tsd-kind-icon">MIN_<wbr>INT8</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#typedarray" class="tsd-kind-icon">Typed<wbr>Array</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#float64array" class="tsd-kind-icon">float64<wbr>Array</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#uint8float64array" class="tsd-kind-icon">u<wbr>Int8<wbr>Float64<wbr>Array</a>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="modules.html#deserialize" class="tsd-kind-icon">deserialize</a>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter">
-						<a href="globals.html#deserialize" class="tsd-kind-icon">deserialize</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter">
-						<a href="globals.html#deserializewithmetadata" class="tsd-kind-icon">deserialize<wbr>With<wbr>Metadata</a>
+						<a href="modules.html#deserializewithmetadata" class="tsd-kind-icon">deserialize<wbr>With<wbr>Metadata</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#serialize" class="tsd-kind-icon">serialize</a>
+						<a href="modules.html#serialize" class="tsd-kind-icon">serialize</a>
 					</li>
 				</ul>
 			</nav>
@@ -245,17 +181,6 @@
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
-			</ul>
 		</div>
 	</div>
 </footer>
