@@ -1,0 +1,1 @@
+{"version":3,"file":"SerializerError.d.ts","sourceRoot":"","sources":["../../../src/lib/errors/SerializerError.ts"],"names":[],"mappings":"AAAA,qBAAa,eAAgB,SAAQ,KAAK;IAClC,IAAI,EAAE,gBAAgB,CAAC;gBAEX,OAAO,EAAE,MAAM,EAAE,IAAI,EAAE,gBAAgB;CAI1D;AAED,oBAAY,gBAAgB;IAC3B,eAAe,oBAAoB;IACnC,yBAAyB,8BAA8B;IACvD,mBAAmB,wBAAwB;CAC3C"}
